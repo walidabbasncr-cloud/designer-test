@@ -109,7 +109,7 @@ export default function DesignerTest() {
     setSelectedAnswer(answerIndex)
   }
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (selectedAnswer === null) return
 
     const currentQuestion = currentTest[currentQuestionIndex]
@@ -129,6 +129,11 @@ export default function DesignerTest() {
       setSelectedAnswer(null)
     } else {
       setShowResults(true)
+      // Automatically send email when test completes
+      setTimeout(async () => {
+        // Use the updated testResults that includes the current answer
+        await sendResultsByEmailAutomatically()
+      }, 1000) // Small delay to ensure state is updated
     }
   }
 
@@ -179,9 +184,7 @@ export default function DesignerTest() {
     }
   }
 
-  const sendResultsByEmail = async () => {
-    setEmailSending(true)
-
+  const sendResultsByEmailAutomatically = async () => {
     try {
       const score = calculateScore()
 
@@ -189,6 +192,7 @@ export default function DesignerTest() {
       const detailedResults = currentTest
         .map((question, index) => {
           const result = testResults[index]
+          if (!result) return '' // Skip if result is undefined
           return `
           <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px;">
             <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -232,31 +236,43 @@ export default function DesignerTest() {
         })
         .join("")
 
-      const emailContent = ``
-
-      const formData = new FormData()
-      formData.append("access_key", "fc4ae0ed-1b34-40b5-98d8-78cf969317e1")
-      formData.append("subject", `Résultats Test Designer - ${firstName} ${lastName}`)
-      formData.append("email", "louenes.abbas@numilex.com")
-      formData.append(
-        "message",
-        `Candidat: ${firstName} ${lastName}\nScore: ${score.percentage}% (${score.correct}/${score.total})\nDate: ${new Date().toLocaleDateString("fr-FR")}`,
-      )
-      formData.append("", emailContent)
-
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: formData,
+      // Use Resend API
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          score,
+          detailedResults,
+        }),
       })
 
       if (response.ok) {
         setEmailSent(true)
-        console.log("[v0] Email sent successfully via Web3Forms")
+        console.log("Email sent automatically via Resend")
+        return true
       } else {
         throw new Error("Failed to send email")
       }
     } catch (error) {
-      console.error("[v0] Error sending email:", error)
+      console.error("Error sending email automatically:", error)
+      return false
+    }
+  }
+
+  const sendResultsByEmail = async () => {
+    setEmailSending(true)
+
+    try {
+      const success = await sendResultsByEmailAutomatically()
+      if (!success) {
+        throw new Error("Automatic email failed")
+      }
+    } catch (error) {
+      console.error("Error sending email:", error)
       const subject = encodeURIComponent(`Résultats Test Designer - ${firstName} ${lastName}`)
       const body = encodeURIComponent(
         `Candidat: ${firstName} ${lastName}\nScore: ${calculateScore().percentage}% (${calculateScore().correct}/${calculateScore().total})\nDate: ${new Date().toLocaleDateString("fr-FR")}\n\nVeuillez consulter les détails complets dans l'interface du test.`,
@@ -371,21 +387,9 @@ export default function DesignerTest() {
               </p>
             </CardHeader>
             <CardContent className="text-center">
-              {emailSent ? (
-                <div className="text-green-600 font-medium">
-                  ✓ Résultats envoyés avec succès à louenes.abbas@numilex.com
-                </div>
-              ) : (
-                <Button
-                  onClick={sendResultsByEmail}
-                  size="lg"
-                  className="bg-blue-600 hover:bg-blue-700"
-                  disabled={emailSending}
-                >
-                  <Mail className="mr-2 h-5 w-5" />
-                  {emailSending ? "Envoi en cours..." : "Envoyer les résultats par email"}
-                </Button>
-              )}
+              <div className="text-green-600 font-medium">
+                ✓ Résultats envoyés automatiquement au département recrutement  ✓
+              </div>
             </CardContent>
           </Card>
 
