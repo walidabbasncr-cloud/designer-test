@@ -17,19 +17,12 @@ export async function POST(request: NextRequest) {
               ${score.percentage}%
             </div>
             <p style="color: #6b7280; margin: 0; font-size: 18px;">
-              ${score.correct} / ${score.total} réponses correctes
+              ${score.correct} / 20 réponses correctes
             </p>
             <p style="color: #6b7280; margin: 10px 0 0 0;">
               Date: ${new Date().toLocaleDateString('fr-FR')}
             </p>
           </div>
-        </div>
-        
-        <div style="margin-top: 30px;">
-          <h3 style="color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
-            Détail des Réponses
-          </h3>
-          ${detailedResults}
         </div>
         
         <div style="margin-top: 30px; padding: 20px; background: #f9fafb; border-radius: 8px; text-align: center;">

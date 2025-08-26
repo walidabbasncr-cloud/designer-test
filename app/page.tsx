@@ -275,7 +275,7 @@ export default function DesignerTest() {
       console.error("Error sending email:", error)
       const subject = encodeURIComponent(`Résultats Test Designer - ${firstName} ${lastName}`)
       const body = encodeURIComponent(
-        `Candidat: ${firstName} ${lastName}\nScore: ${calculateScore().percentage}% (${calculateScore().correct}/${calculateScore().total})\nDate: ${new Date().toLocaleDateString("fr-FR")}\n\nVeuillez consulter les détails complets dans l'interface du test.`,
+        `Candidat: ${firstName} ${lastName}\nScore: ${calculateScore().percentage}% (${calculateScore().correct}/20)\nDate: ${new Date().toLocaleDateString("fr-FR")}\n\nVeuillez consulter les détails complets dans l'interface du test.`,
       )
       window.open(`mailto:louenes.abbas@numilex.com?subject=${subject}&body=${body}`)
       setEmailSent(true)
@@ -383,7 +383,7 @@ export default function DesignerTest() {
                 </span>
               </div>
               <p className="text-xl text-gray-600">
-                {score.correct} / {score.total} réponses correctes
+                {score.correct} / 20 réponses correctes
               </p>
             </CardHeader>
             <CardContent className="text-center">
