@@ -410,9 +410,6 @@ export default function DesignerTest() {
                           ) : (
                             <XCircle className="h-5 w-5 text-red-600" />
                           )}
-                          <Badge className={getDifficultyColor(question.difficulty)}>
-                            {getDifficultyLabel(question.difficulty)}
-                          </Badge>
                         </div>
                         <span className="text-sm text-gray-500">Test {question.testNumber}</span>
                       </div>
@@ -463,9 +460,6 @@ export default function DesignerTest() {
             <span className="text-sm text-gray-600">
               Question {currentQuestionIndex + 1} sur {currentTest.length}
             </span>
-            <Badge className={getDifficultyColor(currentQuestion.difficulty)}>
-              {getDifficultyLabel(currentQuestion.difficulty)}
-            </Badge>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
